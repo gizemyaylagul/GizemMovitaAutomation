@@ -7,10 +7,16 @@ public class Test1 extends BaseMovita {
 
 
 
-    @Test
+    @Test(priority = 0)
     public void openMovita(){
+
         open();
     }
+    @Test(priority = 1)
+    public void logo(){
+        click(llogo);
+    }
+
 
 
 }
