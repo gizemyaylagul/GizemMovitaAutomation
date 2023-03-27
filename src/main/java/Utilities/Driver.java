@@ -10,45 +10,50 @@ import org.openqa.selenium.safari.SafariDriver;
 
 public class Driver {
 
-    private static WebDriver driver;
 
-    public static WebDriver getDriver(){
-         return getDriver(Browsers.CHROME);
+    private static WebDriver driver;
+    public static ThreadLocal<WebDriver> drivers= new ThreadLocal<>();
+
+    public static WebDriver getDriver() {
+        return getDriver(Browsers.CHROME);
     }
 
     public static WebDriver getDriver(Browsers browsers) {
-        if (driver == null) {
+
+        if (drivers.get()== null) {
             switch (browsers) {
+
                 case EDGE:
                     WebDriverManager.edgedriver().setup();
-                    driver = new EdgeDriver();
+                    drivers.set(new EdgeDriver());
                     break;
                 case SAFARI:
                     WebDriverManager.safaridriver().setup();
-                    driver = new SafariDriver();
+                    drivers.set(new SafariDriver());
                     break;
                 case FIREFOX:
                     WebDriverManager.firefoxdriver().setup();
-                    driver = new FirefoxDriver();
+                    drivers.set(new FirefoxDriver());
                     break;
                 default:
                     WebDriverManager.chromedriver().setup();
                     ChromeOptions options = new ChromeOptions();
                     options.addArguments("--remote-allow-origins=*");
-                    options.addArguments("--headles");
-                    driver = new ChromeDriver(options);
+                    //options.addArguments("--headles");
+                    drivers.set(new ChromeDriver(options));
                     break;
 
             }
 
         }
-        return driver;
+        return drivers.get();
 
     }
-    public static void quitDriver(){
-        if (driver!=null){
-            driver.quit();
-            driver=null;
+
+    public static void quitDriver() {
+        if (drivers.get() != null) {
+            drivers.get().quit();
+            drivers.set(null);
 
         }
     }

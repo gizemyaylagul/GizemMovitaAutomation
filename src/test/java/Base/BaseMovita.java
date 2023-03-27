@@ -1,21 +1,22 @@
 package Base;
 
 import Locaators.Locator;
+import Utilities.Browsers;
 import Utilities.Driver;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class BaseMovita implements Locator {
     private WebDriver driver;
@@ -30,15 +31,16 @@ public class BaseMovita implements Locator {
             driver=Driver.getDriver();
             wait=new WebDriverWait(driver,Duration.ofSeconds(10));
         }*/
-    @BeforeSuite
-    public void beforeSuite() {
-        driver = Driver.getDriver();
+    @BeforeTest
+    @Parameters("browser")
+    public void beforeTest(@Optional("CHROME") String browser) {
+        driver = Driver.getDriver(Browsers.valueOf(browser));
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
 
-    @AfterSuite
-    public void afterSuite() {
+    @AfterTest
+    public void afterTest() {
         Driver.quitDriver();
     }
 
@@ -51,7 +53,6 @@ public class BaseMovita implements Locator {
         click(element);
 
     }
-
     public void click(WebElement element) {
         element.click();
 
@@ -78,7 +79,7 @@ public class BaseMovita implements Locator {
     }
 
     public void getScreenShot(String name) {
-        String filedesk= "screenshot/"+name+ " "+LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))+".png";
+        String filedesk= "screenshot/"+name+ " "+LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"))+".png";
         TakesScreenshot takesScreenshot = ((TakesScreenshot) driver);
         File source = takesScreenshot.getScreenshotAs(OutputType.FILE);
         File target = new File(filedesk);
@@ -88,6 +89,21 @@ public class BaseMovita implements Locator {
             throw new RuntimeException(e);
         }
 
+    }
+    public void hoverOver(WebElement element){
+        new Actions(driver).moveToElement(element).build().perform();
+
+    }
+    public void headerOver(){
+        List<WebElement> list=driver.findElements(Anasayfa);
+        for (WebElement element:list) {new Actions(driver)
+                .pause(500)
+                .moveToElement(element)
+                .build()
+                .perform();
+
+
+        }
     }
 
 
